@@ -32,7 +32,14 @@ func (s *StressTestCmd) Build() *cobra.Command {
 				Concurrency: concurrency,
 			}
 
-			return s.StressTestUseCase.Execute(input)
+			res, err := s.StressTestUseCase.Execute(input)
+			if err != nil {
+				return err
+			}
+
+			cmd.Printf("Duration: %.3fs\n", res.Duration.Seconds())
+
+			return nil
 		},
 	}
 
