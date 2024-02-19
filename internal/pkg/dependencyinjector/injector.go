@@ -4,6 +4,7 @@ import (
 	"github.com/mathcale/goexpert-stresstest-cli-challenge/internal/infra/cli"
 	"github.com/mathcale/goexpert-stresstest-cli-challenge/internal/infra/cli/commands"
 	"github.com/mathcale/goexpert-stresstest-cli-challenge/internal/pkg/httpclient"
+	"github.com/mathcale/goexpert-stresstest-cli-challenge/internal/usecases/report"
 	"github.com/mathcale/goexpert-stresstest-cli-challenge/internal/usecases/stress"
 )
 
@@ -24,7 +25,8 @@ func NewDependencyInjector() *DependencyInjector {
 func (d *DependencyInjector) Inject() (*Dependencies, error) {
 	httpClient := httpclient.NewHttpClient()
 	stressTestUseCase := stress.NewStressTestUseCase(httpClient)
-	stressTestCmd := commands.NewStressTestCmd(stressTestUseCase)
+	reportUseCase := report.NewReportUseCase()
+	stressTestCmd := commands.NewStressTestCmd(stressTestUseCase, reportUseCase)
 
 	cli := cli.NewCLI(stressTestCmd.Build())
 

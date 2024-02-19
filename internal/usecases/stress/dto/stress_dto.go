@@ -13,7 +13,6 @@ type StressTestInput struct {
 }
 
 type StressTestOutput struct {
-	Duration  time.Duration
-	Completed uint64
-	Results   []*httpclient.HttpClientResponse
+	Duration time.Duration
+	Results  []*httpclient.HttpClientResponse
 }

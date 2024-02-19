@@ -7,6 +7,7 @@ import (
 
 	"github.com/briandowns/spinner"
 	"github.com/go-playground/validator/v10"
+	"github.com/gookit/color"
 
 	"github.com/mathcale/goexpert-stresstest-cli-challenge/internal/pkg/httpclient"
 	"github.com/mathcale/goexpert-stresstest-cli-challenge/internal/usecases/stress/dto"
@@ -27,9 +28,12 @@ type Job struct {
 }
 
 func NewStressTestUseCase(c httpclient.HttpClientInterface) *StressTestUseCase {
+	green := color.FgGreen.Render
+
 	s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 	s.Color("blue")
-	s.FinalMSG = "✓ Stress test finished!\n\n"
+	s.Suffix = " Executing stress test..."
+	s.FinalMSG = fmt.Sprintf("%s Stress test finished!\n\n", green("✓"))
 
 	return &StressTestUseCase{
 		HTTPClient: c,
@@ -39,8 +43,6 @@ func NewStressTestUseCase(c httpclient.HttpClientInterface) *StressTestUseCase {
 }
 
 func (uc *StressTestUseCase) Execute(input dto.StressTestInput) (*dto.StressTestOutput, error) {
-	uc.spinner.Suffix = fmt.Sprintf(" Executing stress test with input: %+v\n", input)
-
 	if err := uc.validateInput(input); err != nil {
 		return nil, err
 	}
