@@ -9,7 +9,7 @@ import (
 )
 
 type ReportUseCaseInterface interface {
-	Execute(input dto.ReportInput) (*dto.ReportOutput, error)
+	Execute(input dto.ReportInput) *dto.ReportOutput
 }
 
 type ReportUseCase struct{}
@@ -18,7 +18,7 @@ func NewReportUseCase() *ReportUseCase {
 	return &ReportUseCase{}
 }
 
-func (uc *ReportUseCase) Execute(input dto.ReportInput) (*dto.ReportOutput, error) {
+func (uc *ReportUseCase) Execute(input dto.ReportInput) *dto.ReportOutput {
 	statusCount := countStatusOccurrences(input.Results)
 	successfulReqs := getSuccessfulRequestsCount(input.Results)
 
@@ -35,13 +35,17 @@ func (uc *ReportUseCase) Execute(input dto.ReportInput) (*dto.ReportOutput, erro
 		SuccessfulReqs:     successfulReqs,
 		FailedReqs:         uint64(len(input.Results)) - successfulReqs,
 		LatencyPercentiles: calculatePercentiles(sortedResults),
-	}, nil
+	}
 }
 
 func countStatusOccurrences(responses []*httpclient.HttpClientResponse) map[int]uint64 {
 	statusMap := make(map[int]uint64)
 
 	for _, r := range responses {
+		if r.StatusCode == nil {
+			continue
+		}
+
 		statusMap[*r.StatusCode]++
 	}
 
@@ -66,6 +70,11 @@ func calculatePercentiles(sortedResps []*httpclient.HttpClientResponse) map[int]
 
 	for _, p := range []int{50, 75, 90, 95, 99} {
 		idx := (sortedRespsLen * p) / 100
+
+		if sortedRespsLen == 0 {
+			percentiles[p] = 0
+			continue
+		}
 
 		if sortedRespsLen > 1 {
 			idx = idx - 1

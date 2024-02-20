@@ -15,6 +15,10 @@ import (
 var blue = color.FgBlue.Render
 var bold = color.OpBold.Render
 
+type StressTestCmdInterface interface {
+	Build() *cobra.Command
+}
+
 type StressTestCmd struct {
 	StressTestUseCase stress.StressTestUseCaseInterface
 	ReportUseCase     report.ReportUseCaseInterface
@@ -68,11 +72,7 @@ func (s *StressTestCmd) run(cmd *cobra.Command, args []string) error {
 		Results:  stressOut.Results,
 	}
 
-	reportOut, err := s.ReportUseCase.Execute(reportInput)
-	if err != nil {
-		return err
-	}
-
+	reportOut := s.ReportUseCase.Execute(reportInput)
 	s.printReport(cmd, reportOut)
 
 	return nil
